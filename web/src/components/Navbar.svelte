@@ -1,8 +1,8 @@
 <script lang="ts">
   import { app } from "../lib/app.svelte";
   import { theme } from "../lib/theme.svelte";
-  import logoColor from "../assets/wfrc-color.png";
-  import logoWhite from "../assets/wfrc-white.png";
+  import Logo from "./Logo.svelte";
+  import { site } from "../lib/site";
   import Icon from "./Icon.svelte";
   import ReportButton from "./ReportButton.svelte";
   import { replayTour } from "../lib/tour";
@@ -12,8 +12,8 @@
 </script>
 
 <header class="nav">
-  <img class="wfrc-logo" src={theme.resolved === "dark" ? logoWhite : logoColor} alt="Wasatch Front Regional Council" width="53" height="30" />
-  <h1 class="brand">Community profiles</h1>
+  <Logo size={30} />
+  <h1 class="brand">{site.title}</h1>
   <span class="draft" title="Not every number has been checked yet" aria-label="Draft: not every number has been checked yet">DRAFT</span>
   <button class="field-btn" id="area-field" data-tour="search" aria-haspopup="dialog" aria-expanded={app.picker === "area"} onclick={() => (app.picker = app.picker === "area" ? null : "area")}>
     <Icon name="search" size={15} />
@@ -26,5 +26,5 @@
   <button class="btn-ghost" onclick={replayTour} title="Take a quick tour of the profiles"><Icon name="help" size={15} /><span>Tour</span></button>
   <button class="btn-ghost" onclick={() => (app.page = app.page === "methods" ? "" : "methods")}><Icon name="info" size={15} /><span>{app.page === "methods" ? "Back to the data" : "Documentation"}</span></button>
   <button class="btn-ghost" onclick={() => theme.cycle()} aria-label="Theme: {themeName}" title="Theme: {themeName} (click to change)"><Icon name={themeIcon} size={15} /></button>
-  <a class="btn-ghost" href="https://github.com/WFRCAnalytics/APP-Community-Profiles" target="_blank" rel="noopener" aria-label="Source code and data on GitHub" title="Source code and data on GitHub"><Icon name="github" size={15} /></a>
+  <a class="btn-ghost" href="https://github.com/ar-puuk/Demographic-Profiles" target="_blank" rel="noopener" aria-label="Source code and data on GitHub" title="Source code and data on GitHub"><Icon name="github" size={15} /></a>
 </header>

@@ -1,7 +1,7 @@
 // Light, dark or follow the system. The choice is kept per viewer; the resolved mode drives CSS (data-theme) and
 // is reactive, so charts and the map redraw when it changes.
 export type Pref = "light" | "dark" | "system";
-const KEY = "wfrc-profiles-theme";
+const KEY = "utah-profiles-theme";
 
 function stored(): Pref {
   try {

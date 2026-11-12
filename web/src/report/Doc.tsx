@@ -5,8 +5,9 @@ import { Document, Image, Link, Page, Path, Rect, Svg, Text, View, type Document
 import { geoMercator, geoPath } from "d3-geo";
 import qrcode from "qrcode-generator";
 import type { ReactElement } from "react";
-import logoColor from "../assets/wfrc-color.png";
-import logoWhite from "../assets/wfrc-white.png";
+import logoColor from "../assets/logo-color.png";
+import { site } from "../lib/site";
+import logoWhite from "../assets/logo-white.png";
 import { TYPE_LABEL } from "../lib/indicators";
 import type { GridPage, Page as ReportPage, ReportModel, TablePage } from "./build";
 import { BarChart, ColumnChart, DivergingChart, TripleChart, DonutChart, LineChart, Pyramid, Sparkline, StackedChart } from "./charts";
@@ -29,13 +30,13 @@ function Furniture({ m, section }: { m: ReportModel; section: string }): ReactEl
     <>
       <View style={{ position: "absolute", left: M, right: M, top: 18, height: 18, flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomWidth: 0.75, borderBottomColor: C.border, paddingBottom: 4 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <Image src={logoColor} style={{ width: 22, height: 12.5 }} />
+          <Image src={logoColor} style={{ width: 14, height: 14 }} />
           <Text style={body(6.6, { color: C.muted, fontWeight: 600 })}>{sel.label}{cmp ? ` compared with ${cmp.label}` : ""} · Community profile</Text>
         </View>
         <Text style={body(6.6, { color: C.muted, fontWeight: 600 })}>{section}</Text>
       </View>
       <View style={{ position: "absolute", left: M, right: M, bottom: 18, flexDirection: "row", justifyContent: "space-between", borderTopWidth: 0.75, borderTopColor: C.border, paddingTop: 4 }}>
-        <Text style={body(6.2, { color: C.muted })}>Wasatch Front Regional Council · {m.generated}</Text>
+        <Text style={body(6.2, { color: C.muted })}>{site.title} · {m.generated}</Text>
         <Text style={body(6.2, { color: C.muted })} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
       </View>
     </>
@@ -246,7 +247,7 @@ function Cover({ m }: { m: ReportModel }): ReactElement {
     return (
       <Page size={[W, H]} style={{ backgroundColor: C.white }}>
         <View style={{ position: "absolute", left: 0, top: 0, width: W, height: 262, backgroundColor: C.navy }} />
-        <Image src={logoWhite} style={{ position: "absolute", left: M, top: 30, width: 55, height: 31 }} />
+        <Image src={logoWhite} style={{ position: "absolute", left: M, top: 30, width: 36, height: 36 }} />
         <View style={{ position: "absolute", left: M, top: 100, width: W - 2 * M - 150 }}>{name}</View>
         <View style={{ position: "absolute", right: 40, top: 40 }}><Locator locator={m.locator} w={116} h={160} /></View>
         <View style={{ position: "absolute", left: M, top: 292 }}>{tileGrid}</View>
@@ -257,7 +258,7 @@ function Cover({ m }: { m: ReportModel }): ReactElement {
   return (
     <Page size={[W, H]} style={{ backgroundColor: C.white }}>
       <View style={{ position: "absolute", left: 0, top: 0, width: 290, height: H, backgroundColor: C.navy }} />
-      <Image src={logoWhite} style={{ position: "absolute", left: 32, top: 30, width: 55, height: 31 }} />
+      <Image src={logoWhite} style={{ position: "absolute", left: 32, top: 30, width: 36, height: 36 }} />
       <View style={{ position: "absolute", left: 32, top: 150, width: 230 }}>{name}</View>
       <View style={{ position: "absolute", left: 32, bottom: 30 }}><Locator locator={m.locator} w={92} h={130} /></View>
       <View style={{ position: "absolute", left: 326, top: 40 }}>{tileGrid}</View>
@@ -327,7 +328,7 @@ export function Qr({ url, size }: { url: string; size: number }): ReactElement {
 export function ReportDocument({ m }: { m: ReportModel }): ReactElement<DocumentProps> {
   const { sel, cmp } = m.ctx;
   return (
-    <Document title={`${sel.label}${cmp ? ` and ${cmp.label}` : ""}: community profile`} author="Wasatch Front Regional Council" subject="Community profile" creator="WFRC Community Profiles" language="en-US">
+    <Document title={`${sel.label}${cmp ? ` and ${cmp.label}` : ""}: community profile`} author={site.organization || site.title} subject="Community profile" creator={site.title} language="en-US">
       <Cover m={m} />
       {m.pages.map((p, i) =>
         p.type === "grid" ? <GridPageView key={p.id} p={p} m={m} index={i} /> :

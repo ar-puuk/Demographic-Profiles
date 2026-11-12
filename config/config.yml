@@ -31,8 +31,8 @@ export:
 # names of its own. defaults: the area opened for each geography type; benchmarks: larger areas offered first
 # when comparing; region_ids: geo_ids shown as the region label.
 app:
-  title: WFRC Community Profiles
-  organization: WFRC
+  title: Utah Community Profiles
+  organization: ""
   default_type: aog
   defaults: { aog: aog-wfrc, mpo: mpo-wfrc, county: "49035", place: "4967000", state: "49" }
   benchmarks: ["49", aog-wfrc, mpo-wfrc]
@@ -173,4 +173,4 @@ qcew:
   years: [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
   agglvl: [70, 71, 74]
   state_agglvl: [50, 51, 54]
-  user_agent: APP-Community-Profiles pipeline
+  user_agent: Utah-Community-Profiles pipeline

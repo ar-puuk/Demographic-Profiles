@@ -23,11 +23,11 @@ export async function generateReport(ctx: Ctx, { orientation, format = "document
     if (ctx.signal?.aborted) throw new DOMException("Report cancelled", "AbortError");
     progress?.(1, 1, "Laying out the poster");
     const blob = await pdf(PosterDocument({ m: poster })).toBlob();
-    return { blob, filename: `WFRC-Community-Profile_${names}_${ctx.v}_poster_${orientation}.pdf`, pages: 1 };
+    return { blob, filename: `Community-Profile_${names}_${ctx.v}_poster_${orientation}.pdf`, pages: 1 };
   }
   const model = await buildReport(ctx, { orientation, progress });
   if (ctx.signal?.aborted) throw new DOMException("Report cancelled", "AbortError");
   progress?.(1, 1, "Laying out pages");
   const blob = await pdf(ReportDocument({ m: model })).toBlob();
-  return { blob, filename: `WFRC-Community-Profile_${names}_${ctx.v}_${orientation}.pdf`, pages: model.pages.length + 1 };
+  return { blob, filename: `Community-Profile_${names}_${ctx.v}_${orientation}.pdf`, pages: model.pages.length + 1 };
 }

@@ -9,7 +9,7 @@ const ready = async (page: Page) => {
 // The guided tour offers itself on the homepage; every test but the tour's own opts out, as a returning visitor would.
 test.beforeEach(async ({ page }, info) => {
   if (info.title.startsWith("tour")) return;
-  await page.addInitScript(() => localStorage.setItem("wfrc-profiles-tour-off", "1"));
+  await page.addInitScript(() => localStorage.setItem("utah-profiles-tour-off", "1"));
 });
 
 function watchErrors(page: Page) {
@@ -191,7 +191,7 @@ for (const [orientation, box] of [["portrait", "[0 0 612 792]"], ["landscape", "
     await page.getByRole("button", { name: /PDF report/ }).click();
     await page.getByRole("button", { name: new RegExp(orientation, "i") }).click();
     const [download] = await Promise.all([page.waitForEvent("download", { timeout: 150_000 }), page.getByRole("button", { name: "Download PDF" }).click()]);
-    expect(download.suggestedFilename()).toBe(`WFRC-Community-Profile_salt-lake-county-vs-utah-county_2024_${orientation}.pdf`);
+    expect(download.suggestedFilename()).toBe(`Community-Profile_salt-lake-county-vs-utah-county_2024_${orientation}.pdf`);
     const bytes = await (await import("node:fs/promises")).readFile((await download.path())!);
     const text = bytes.toString("latin1");
     expect(text.startsWith("%PDF")).toBe(true);
@@ -226,7 +226,7 @@ for (const [orientation, box] of [["portrait", "[0 0 1728 2592]"], ["landscape",
     await page.getByRole("button", { name: "Poster", exact: true }).click();
     await page.getByRole("button", { name: new RegExp(orientation, "i") }).click();
     const [download] = await Promise.all([page.waitForEvent("download", { timeout: 90_000 }), page.getByRole("button", { name: "Download PDF" }).click()]);
-    expect(download.suggestedFilename()).toBe(`WFRC-Community-Profile_salt-lake-county-vs-utah-county_2024_poster_${orientation}.pdf`);
+    expect(download.suggestedFilename()).toBe(`Community-Profile_salt-lake-county-vs-utah-county_2024_poster_${orientation}.pdf`);
     const text = (await (await import("node:fs/promises")).readFile((await download.path())!)).toString("latin1");
     expect(text.startsWith("%PDF")).toBe(true);
     expect(text).toContain(`/MediaBox ${box}`);
@@ -262,7 +262,7 @@ test("tour: Skip only closes it for the visit, Don't show this again is remember
   // The navbar button clears the choice and starts it again.
   await page.getByRole("button", { name: "Tour" }).click();
   await expect(pop).toBeVisible();
-  expect(await page.evaluate(() => localStorage.getItem("wfrc-profiles-tour-off"))).toBeNull();
+  expect(await page.evaluate(() => localStorage.getItem("utah-profiles-tour-off"))).toBeNull();
   await page.keyboard.press("Escape");
   await expect(pop).toHaveCount(0);
 });

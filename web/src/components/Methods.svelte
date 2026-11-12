@@ -4,7 +4,7 @@
   import { site } from "../lib/site";
   import Chip from "./Chip.svelte";
 
-  const repo = "https://github.com/WFRCAnalytics/APP-Community-Profiles";
+  const repo = "https://github.com/ar-puuk/Demographic-Profiles";
   const sources = [
     { topic: "People, households, housing, income, education, commuting", source: "American Community Survey 5-year estimates", years: "2005–2009 to 2020–2024", finest: "Block group (2009–2013 on)" },
     { topic: "Allocation weights", source: "Decennial Census counts, 2010 and 2020", years: "2010, 2020", finest: "Block" },
@@ -117,7 +117,7 @@
     <section class="foot" aria-labelledby="m-use">
       <h3 id="m-use">Reuse and cite</h3>
       <p>All data is in the <a href="{repo}/tree/main/data" target="_blank" rel="noopener">project repository</a> as Parquet, every chart has a table view, and the Indicators tab has a CSV download. The pipeline rebuilds every file from the original sources: <code>uv sync</code>, add a Census API key to <code>.env</code>, then <code>uv run python -m pipeline all</code>. Add a vintage, geography or state in <code>config/config.yml</code>; see <a href="{repo}/blob/main/docs/EXTENDING.md" target="_blank" rel="noopener">extending</a>.</p>
-      <p>{site.organization} material is licensed CC BY 4.0; data from other sources keeps its own terms. Suggested citation: Wasatch Front Regional Council, Community Profiles, using data from the U.S. Census Bureau and the U.S. Bureau of Labor Statistics.</p>
+      <p>Derived from the Community Profiles of the Wasatch Front Regional Council (CC BY 4.0); data from other sources keeps its own terms. Suggested citation: {site.title}, using data from the U.S. Census Bureau and the U.S. Bureau of Labor Statistics.</p>
     </section>
   </article>
 </div>

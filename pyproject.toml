@@ -1,7 +1,7 @@
 [project]
 name = "APP-Community-Profiles"
 version = "0.1.0"
-description = "WFRC community profiles: data pipeline and static map-first dashboard"
+description = "Utah community profiles: data pipeline and static map-first dashboard"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

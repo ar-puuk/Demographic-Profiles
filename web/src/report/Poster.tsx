@@ -2,7 +2,8 @@
 // scaled up by ZOOM, so every tile, chart and map written for the document is reused and comes out at poster size.
 import { Document, Image, Link, Page, Text, View, type DocumentProps } from "@react-pdf/renderer";
 import type { ReactElement } from "react";
-import logoWhite from "../assets/wfrc-white.png";
+import logoWhite from "../assets/logo-white.png";
+import { site } from "../lib/site";
 import { TYPE_LABEL } from "../lib/indicators";
 import { PanelView, Qr, TileView } from "./Doc";
 import { CANVAS, GRID, SHEET, ZOOM, type PosterModel } from "./posterBuild";
@@ -35,7 +36,7 @@ function Poster({ m }: { m: PosterModel }): ReactElement {
   return (
     <View style={{ position: "absolute", left: 0, top: 0, width: W, height: H, transform: `scale(${ZOOM})`, transformOrigin: "top left" }}>
       <View style={{ position: "absolute", left: 0, top: 0, width: W, height: HEAD, backgroundColor: C.navy }} />
-      <Image src={logoWhite} style={{ position: "absolute", left: M, top: (HEAD - 25) / 2, width: 44, height: 25 }} />
+      <Image src={logoWhite} style={{ position: "absolute", left: M, top: (HEAD - 28) / 2, width: 28, height: 28 }} />
       <View style={{ position: "absolute", left: M + 60, top: 0, height: HEAD, justifyContent: "center", width: W - 2 * M - 60 - 230 }}>
         <Text style={display(nameSize, { color: "#ffffff", lineHeight: 1.05 })}>{name}</Text>
         <Text style={body(8.2, { color: "#ffffff", opacity: 0.9, marginTop: 2 })}>Community profile · {type} · {m.ctx.v - 4}–{m.ctx.v} American Community Survey{cmp ? ` · ${cmp.label} in orange` : ""}</Text>
@@ -58,7 +59,7 @@ function Poster({ m }: { m: PosterModel }): ReactElement {
 
       <View style={{ position: "absolute", left: M, right: M, top: H - FOOT, height: FOOT, flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: 0.75, borderTopColor: C.border }}>
         <Link src={url} style={body(6.8, { color: C.sel })}>{url}</Link>
-        <Text style={body(6.8, { color: C.muted })}>Wasatch Front Regional Council · {m.generated}</Text>
+        <Text style={body(6.8, { color: C.muted })}>{site.title} · {m.generated}</Text>
       </View>
     </View>
   );
@@ -68,7 +69,7 @@ export function PosterDocument({ m }: { m: PosterModel }): ReactElement<Document
   const { sel, cmp } = m.ctx;
   const { W, H } = SHEET[m.orientation];
   return (
-    <Document title={`${sel.label}${cmp ? ` and ${cmp.label}` : ""}: community profile poster`} author="Wasatch Front Regional Council" subject="Community profile poster" creator="WFRC Community Profiles" language="en-US">
+    <Document title={`${sel.label}${cmp ? ` and ${cmp.label}` : ""}: community profile poster`} author={site.organization || site.title} subject="Community profile poster" creator={site.title} language="en-US">
       <Page size={[W, H]} style={{ backgroundColor: C.white }}><Poster m={m} /></Page>
     </Document>
   );

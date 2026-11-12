@@ -10,7 +10,7 @@ from .paths import ROOT
 
 def main(argv: list[str] | None = None) -> int:
     load_dotenv(ROOT / ".env")
-    parser = argparse.ArgumentParser(prog="profiles", description="WFRC community profiles data pipeline")
+    parser = argparse.ArgumentParser(prog="profiles", description="Utah community profiles data pipeline")
     parser.add_argument("command", choices=["boundaries", "audit", "validate", "acs", "geographies", "crosswalk", "aggregate", "pep", "lodes", "qcew", "qa", "export", "all"],
                         help="boundaries: snapshot ArcGIS boundaries; audit: compare with counties; "
                              "validate: check ACS tables; acs: pull ACS tables; geographies: build the "

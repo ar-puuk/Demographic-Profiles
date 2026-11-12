@@ -5,7 +5,7 @@
 import { tick, untrack } from "svelte";
 import { app } from "./app.svelte";
 
-const KEY = "wfrc-profiles-tour-off";
+const KEY = "utah-profiles-tour-off";
 
 type Step = { tab: "overview" | "people"; target: string; title: string; text: string; side?: "top" | "bottom" | "left" | "right" };
 

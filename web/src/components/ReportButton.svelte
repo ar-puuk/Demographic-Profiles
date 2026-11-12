@@ -6,7 +6,7 @@
   import { site } from "../lib/site";
   import Icon from "./Icon.svelte";
 
-  const KEY = "wfrc-profiles-report-orientation", FORMAT_KEY = "wfrc-profiles-report-format";
+  const KEY = "utah-profiles-report-orientation", FORMAT_KEY = "utah-profiles-report-format";
   type Orientation = "portrait" | "landscape";
   type Format = "document" | "poster";
   const saved = (): Orientation => {
