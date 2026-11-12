@@ -1,9 +1,7 @@
 """Annual population estimates (Population Estimates Program) for the state, counties and places.
 
 Written to data/pep/{state,county,place}.parquet with columns geo_id, geo_type, year, vintage, estimate,
-method. WFRC areas that are exactly a union of whole counties (the AOG, Morgan RPO) are summed from
-the county estimates (method = aggregated); areas that cut through counties get no PEP series, since the
-program does not publish estimates below the place level.
+method. The program does not publish estimates below the place level, so tracts get no series.
 """
 from __future__ import annotations
 
@@ -13,7 +11,7 @@ import pandas as pd
 import requests
 
 from .db import connect, write_parquet
-from .paths import DATA, META, RAW
+from .paths import DATA, RAW
 from .util import load_config, update_manifest
 
 
@@ -66,18 +64,5 @@ def run(refresh: bool = False) -> None:
         dest = DATA / "pep" / f"{geo_type}.parquet"
         write_parquet(con, f"SELECT * FROM pep_df WHERE geo_type = '{geo_type}'", dest, "year, geo_id")
         manifest[geo_type] = int((long["geo_type"] == geo_type).sum())
-    # areas that are a union of whole counties: sum the county estimates
-    areas = META / "area_counties.parquet"
-    if areas.exists():
-        con.execute(f"""
-            CREATE OR REPLACE TEMP TABLE area_pep AS
-            SELECT a.geo_id, split_part(a.geo_id, '-', 1) AS geo_type, p.year, p.vintage,
-                   sum(p.estimate) AS estimate, 'aggregated' AS method
-            FROM read_parquet('{areas.as_posix()}') a
-            JOIN pep_df p ON p.geo_type = 'county' AND p.geo_id = a.county
-            GROUP BY a.geo_id, p.year, p.vintage
-        """)
-        write_parquet(con, "SELECT * FROM area_pep", DATA / "pep" / "areas.parquet", "geo_id, year")
-        manifest["areas"] = con.execute("SELECT count(*) FROM area_pep").fetchone()[0]
     update_manifest("pep", manifest)
     print(f"pep rows: {manifest}")

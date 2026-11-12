@@ -29,7 +29,7 @@ from shapely.ops import nearest_points, polylabel, transform
 
 from . import lodes, tiger
 from .db import connect, sql_path, write_parquet
-from .paths import BOUNDARIES, DATA, META, RAW
+from .paths import DATA, META
 from .util import load_config, update_manifest, write_if_changed
 
 PRECISION = 1e-5     # degrees, about 1 m
@@ -98,13 +98,12 @@ def block_weights(con, cfg: dict) -> bool:
     with jobs plus resident workers in the latest LODES year). False when the block files are not on disk."""
     lc = cfg["lodes"]
     year = max(lc["years"])
-    area_blocks = RAW / "derived" / "block_area_2020.parquet"
-    blocks = RAW / "tiger" / f"blocks_{cfg['state']['abbr']}_{cfg['decennial'][2020]['tiger_year']}.parquet"
+    blocks = tiger.blocks(cfg["state"]["abbr"], 2020, tiger.county_fips(cfg["state"]["abbr"], cfg["tiger"]["year"]))
     files = {k: lodes.url(lc, k, year)[1] for k in ("wac", "rac")}
-    if not (area_blocks.exists() and blocks.exists() and all(f.exists() for f in files.values()) and lodes.url(lc, "xwalk")[1].exists()):
-        print("block weights are not on disk: anchoring areas and the rest of the state at geometric points")
+    if not (blocks.exists() and all(f.exists() for f in files.values()) and lodes.url(lc, "xwalk")[1].exists()):
+        print("block weights are not on disk: anchoring places and the rest of the state at geometric points")
         return False
-    lodes.build_block_geo(con, lodes.url(lc, "xwalk")[1], area_blocks)
+    lodes.build_block_geo(con, lodes.url(lc, "xwalk")[1])
     con.execute(f"""
         CREATE OR REPLACE TEMP TABLE block_xy AS
         SELECT b.block, ST_X(b.geometry::GEOMETRY) AS lon, ST_Y(b.geometry::GEOMETRY) AS lat, j.jobs
@@ -159,18 +158,16 @@ def rest_of_state(con, cfg: dict, sources: dict[str, str], weighted: bool) -> tu
 
 def app_meta(cfg: dict) -> bytes:
     """data/meta/app.json: the names and defaults the web app reads instead of carrying its own."""
-    first_bg = cfg["acs"]["geographies"]["block_group"]["since"]   # custom areas start with the first block-group vintage
-    meta = {**cfg["app"], "state": cfg["state"], "outside_id": cfg["lodes"]["other_id"], "custom_since": first_bg}
+    meta = {**cfg["app"], "state": cfg["state"], "outside_id": cfg["lodes"]["other_id"]}
     return json.dumps(meta, indent=1, sort_keys=True).encode("utf-8") + b"\n"
 
 
 def run(refresh: bool = False) -> None:
     cfg = load_config()
     write_if_changed(META / "app.json", app_meta(cfg))
-    state, year = cfg["state"]["abbr"], cfg["tiger"]["audit_year"]
+    state, year = cfg["state"]["abbr"], cfg["tiger"]["year"]
     con = connect()
-    sources = {t: (f"SELECT geo_id, geometry FROM read_parquet('{sql_path(BOUNDARIES / (t + '.parquet'))}')")
-               for t in cfg["arcgis"]["layers"]}
+    sources = {}
     for kind, geo_type in (("counties", "county"), ("places", "place"), ("tracts", "tract")):
         path = tiger.cartographic(kind, state, year, refresh)
         sources[geo_type] = f"SELECT GEOID AS geo_id, geometry FROM read_parquet('{sql_path(path)}')"

@@ -1,7 +1,6 @@
 """Geography registry: every selectable area in one table (meta/geographies.parquet).
 
-Custom WFRC areas come from the tracked boundary snapshots; the state, counties and places come from
-Census names. Tracts and block groups are data-only geographies and are not listed.
+The state, counties and places come from Census names. Tracts are a data-only geography and are not listed.
 """
 from __future__ import annotations
 
@@ -11,7 +10,7 @@ import pandas as pd
 
 from . import acs
 from .db import connect, sql_path, write_parquet
-from .paths import BOUNDARIES, META
+from .paths import META
 from .util import load_config
 
 PLACE_KINDS = ("city", "town", "CDP", "village", "borough", "municipality")
@@ -41,11 +40,8 @@ def standard(vintage: int, refresh: bool = False) -> pd.DataFrame:
 def run(refresh: bool = False) -> None:
     cfg = load_config()
     con = connect()
-    custom = " UNION ALL ".join(
-        f"SELECT geo_id, geo_type, geo_name, NULL AS kind, organization, acronym, notes "
-        f"FROM read_parquet('{sql_path(BOUNDARIES / (t + '.parquet'))}')" for t in cfg["arcgis"]["layers"])
     con.register("standard_df", standard(max(cfg["acs"]["vintages"]), refresh))
-    query = (f"SELECT * FROM standard_df UNION ALL BY NAME SELECT * FROM ({custom})")
+    query = "SELECT * FROM standard_df"
     META.mkdir(parents=True, exist_ok=True)
     write_parquet(con, query, META / "geographies.parquet", "geo_type, geo_id")
     n = con.execute(f"SELECT count(*) FROM read_parquet('{sql_path(META / 'geographies.parquet')}')").fetchone()[0]

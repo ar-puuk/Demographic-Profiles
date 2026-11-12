@@ -1,14 +1,10 @@
 """BLS Quarterly Census of Employment and Wages: establishments, employment and wages by county,
 ownership and industry (annual averages), from the BLS area files.
 
-Outputs (data/qcew): state.parquet, county.parquet (method = direct) and areas.parquet, the WFRC
-areas that are exactly whole counties (AOG, Morgan RPO), summed from their counties (method = aggregated).
+Outputs (data/qcew): state.parquet and county.parquet (method = direct).
 Columns: geo_id, geo_type, year, ownership, industry, variable, value, flag, method. variable is one of
 estabs, employment, wages, avg_annual_pay. flag is `suppressed` where BLS withholds a value to protect
-confidentiality (the value is empty), and `partial` for an area sum that is missing a suppressed county,
-so it is a lower bound (for avg_annual_pay it is the mean of the reporting counties, not a bound). avg_annual_pay of an
-area is its wages divided by its employment, or the BLS figure itself when a single county contributes (the BLS pay is unrounded). The state file
-uses BLS aggregation levels 50, 51 and 54 where counties use 70, 71 and 74.
+confidentiality (the value is empty). The state file uses BLS aggregation levels 50, 51 and 54 where counties use 70, 71 and 74.
 """
 from __future__ import annotations
 
@@ -63,7 +59,7 @@ def download(cfg: dict, year: int, fips: str, refresh: bool = False) -> Path:
 def run(refresh: bool = False) -> None:
     cfg = load_config()
     qc, state, abbr = cfg["qcew"], cfg["state"]["fips"], cfg["state"]["abbr"]
-    counties = [state + c for c in tiger.county_fips(abbr, cfg["tiger"]["audit_year"])]
+    counties = [state + c for c in tiger.county_fips(abbr, cfg["tiger"]["year"])]
     fips_list = [state + "000"] + counties
     jobs = [(y, f) for y in qc["years"] for f in fips_list]
     with ThreadPoolExecutor(WORKERS) as pool:
@@ -103,29 +99,6 @@ def run(refresh: bool = False) -> None:
         dest = DATA / "qcew" / f"{t}.parquet"
         write_parquet(con, f"SELECT * FROM qcew_long WHERE geo_type = '{t}'", dest, "year, ownership, industry, variable, geo_id")
         manifest[t] = {"bytes": dest.stat().st_size}
-
-    areas = META / "area_counties.parquet"
-    if areas.exists():
-        con.execute(f"""
-            CREATE OR REPLACE TEMP TABLE area_sum AS
-            SELECT a.geo_id, split_part(a.geo_id, '-', 1) AS geo_type, c.year, c.ownership, c.industry,
-                   sum(c.value) FILTER (WHERE c.variable = 'estabs') AS estabs,
-                   sum(c.value) FILTER (WHERE c.variable = 'employment') AS employment,
-                   sum(c.value) FILTER (WHERE c.variable = 'wages') AS wages,
-                   bool_or(c.flag IS NOT NULL) AS partial,
-                   count(DISTINCT c.geo_id) AS counties,
-                   max(c.value) FILTER (WHERE c.variable = 'avg_annual_pay') AS county_pay
-            FROM read_parquet('{sql_path(areas)}') a
-            JOIN qcew_long c ON c.geo_type = 'county' AND c.geo_id = a.county
-            GROUP BY a.geo_id, c.year, c.ownership, c.industry
-        """)
-        parts = [f"SELECT geo_id, geo_type, year, ownership, industry, '{v}' AS variable, {expr} AS value, "
-                 f"CASE WHEN partial THEN 'partial' END AS flag, 'aggregated' AS method FROM area_sum"
-                 for v, expr in (("estabs", "estabs"), ("employment", "employment"), ("wages", "wages"),
-                                 ("avg_annual_pay", "CASE WHEN counties = 1 THEN county_pay ELSE wages / nullif(employment, 0) END"))]
-        write_parquet(con, " UNION ALL ".join(parts), DATA / "qcew" / "areas.parquet",
-                      "year, ownership, industry, variable, geo_id")
-        manifest["areas"] = {"bytes": (DATA / "qcew" / "areas.parquet").stat().st_size}
 
     codes = pd.DataFrame(
         [{"kind": "industry", "code": k, "label": v} for k, v in SECTORS.items()]

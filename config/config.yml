@@ -1,58 +1,35 @@
 # Single source of truth for the profiles pipeline. Nothing below is hardcoded in code.
 
-arcgis:
-  service: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/WFRC_Administrative_and_Planning_Area_Boundaries/FeatureServer
-  # Only features from these organizations are used (MAG is deferred to a later phase).
-  organizations: [WFRC]
-  # geo_type -> layer. name_strip removes words from BoundaryName when building the geo_id slug.
-  layers:
-    aog: { layer: 0, label: Association of Governments, name_strip: [AOG] }
-    mpo: { layer: 1, label: Metropolitan Planning Organization, name_strip: [MPO, Planning, Area] }
-    rpo: { layer: 2, label: Rural Planning Organization, name_strip: [RPO] }
-    fws: { layer: 5, label: Workshop Area, name_strip: ["Co."] }
-
-# The state the profiles cover. To build another state, change these three values (and the arcgis layers).
+# The state the profiles cover. To build another state, change these three values.
 state:
   abbr: UT
   fips: "49"
   name: Utah
 
 tiger:
-  # Vintage of the county polygons used to audit the custom boundaries.
-  audit_year: 2023
+  year: 2023        # vintage of the county, place and tract polygons
 
 # Simplification tolerance (degrees) for the web boundary files, by geography type.
 export:
   metric_crs: 26912          # UTM 12N (metres), used to shrink and measure the Rest of Utah remainder
   rest_margin_m: 2500        # the Rest of Utah point lies at least this far inside the remainder, clear of every area's edge
-  simplify: { aog: 0.0004, mpo: 0.0004, rpo: 0.0004, fws: 0.0004, county: 0.0003, place: 0.0003, tract: 0.0003, state: 0.0010 }
+  simplify: { county: 0.0003, place: 0.0003, tract: 0.0003, state: 0.0010 }
 
 # What the web app shows. Written to data/meta/app.json by the export step; the app has no state or organisation
 # names of its own. defaults: the area opened for each geography type; benchmarks: larger areas offered first
-# when comparing; region_ids: geo_ids shown as the region label.
+# when comparing.
 app:
   title: Utah Community Profiles
   organization: ""
-  default_type: aog
-  defaults: { aog: aog-wfrc, mpo: mpo-wfrc, county: "49035", place: "4967000", state: "49" }
-  benchmarks: ["49", aog-wfrc, mpo-wfrc]
-  region_labels: { aog-wfrc: WFRC region }
-  custom_types: [aog, mpo, rpo, fws]   # areas built from block groups: ACS history starts at the first block-group vintage
+  default_type: state
+  defaults: { county: "49035", place: "4967000", state: "49" }
+  benchmarks: ["49"]
 
-# The area the QA checks reconcile against its member counties (a geo_id from the arcgis layers).
 qa:
-  reference_area: aog-wfrc
-  reference_label: WFRC AOG
-
-audit:
-  crs: "EPSG:32612"            # UTM 12N, metric, for area math
-  equivalent_iou: 0.98         # a boundary this close to one county is treated as that county
-  overlap_tolerance_m2: 10000  # ignore slivers smaller than this when checking overlaps
-  min_county_overlap_km2: 1    # ignore county slivers smaller than this in the audit table
+  tolerance: 0.005             # allowed relative gap in the employment checks
 
 acs:
-  # 5-year end years. Counties, places and tracts go back to 2009; block groups exist in the API from
-  # 2013, so the WFRC areas (built from block groups) start there.
+  # 5-year end years. Counties, places and tracts go back to 2009.
   vintages: [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
   # Census geography -> the `for`/`in` clause used to pull the whole state at that level, and the first
   # vintage the API serves it for.
@@ -61,87 +38,52 @@ acs:
     county: { for: "county:*", in: "state:{fips}", since: 2009 }
     place: { for: "place:*", in: "state:{fips}", since: 2009 }
     tract: { for: "tract:*", in: "state:{fips} county:*", since: 2009 }
-    block_group: { for: "block group:*", in: "state:{fips} county:*", since: 2013 }
-  # Block groups are only published for the latest vintage. Their history is kept in
-  # raw and feeds the WFRC area tables, so the repository stays small.
-  latest_only: [block_group]
   # Whole tables are pulled (every estimate and margin of error). agg says how a table combines when
-  # summing areas later: sum (counts, the default) or median (must be re-derived, never summed).
-  # weight is the 2020/2010 Decennial block count used to split a block group between areas: pop (people) for tables
-  # of people, hh (occupied housing units, i.e. households) for tables of households, hu (housing units) for tables
-  # of all units, so each table is split by what it counts. custom: false keeps a
-  # table out of allocation (workplace-based tables cannot be split by where people live). unit: tract is for
-  # tables the Census does not publish at block group (poverty, group quarters, enrollment, disability):
-  # they are split from tracts instead.
+  # summing areas: sum (counts, the default) or median (never summed).
   tables:
-    B01001: { topic: population, label: Sex by age, weight: pop }
+    B01001: { topic: population, label: Sex by age }
     B01002: { topic: population, label: Median age, agg: median }
-    B02001: { topic: population, label: Race, weight: pop }
-    B03003: { topic: population, label: Hispanic or Latino origin, weight: pop }
-    B26001: { topic: population, label: Group quarters population, weight: pop, unit: tract }
-    B11012: { topic: households, label: Households by type, weight: hh }
-    B25003: { topic: households, label: Tenure, weight: hh }
-    B25044: { topic: households, label: Tenure by vehicles available, weight: hh }
-    B25002: { topic: housing, label: Occupancy status, weight: hu }
-    B25024: { topic: housing, label: Units in structure, weight: hu }
-    B25034: { topic: housing, label: Year structure built, weight: hu }
+    B02001: { topic: population, label: Race }
+    B03003: { topic: population, label: Hispanic or Latino origin }
+    B26001: { topic: population, label: Group quarters population }
+    B11012: { topic: households, label: Households by type }
+    B25003: { topic: households, label: Tenure }
+    B25044: { topic: households, label: Tenure by vehicles available }
+    B25002: { topic: housing, label: Occupancy status }
+    B25024: { topic: housing, label: Units in structure }
+    B25034: { topic: housing, label: Year structure built }
     B25064: { topic: housing, label: Median gross rent, agg: median }
     B25077: { topic: housing, label: Median home value, agg: median }
-    B25063: { topic: housing, label: Gross rent brackets, weight: hh }
-    B25075: { topic: housing, label: Home value brackets, weight: hh }
-    B25070: { topic: housing, label: Gross rent as a share of income, weight: hh }
-    B25091: { topic: housing, label: Owner costs as a share of income, weight: hh }
-    B19001: { topic: income, label: Household income brackets, weight: hh }
+    B25063: { topic: housing, label: Gross rent brackets }
+    B25075: { topic: housing, label: Home value brackets }
+    B25070: { topic: housing, label: Gross rent as a share of income }
+    B25091: { topic: housing, label: Owner costs as a share of income }
+    B19001: { topic: income, label: Household income brackets }
     B19013: { topic: income, label: Median household income, agg: median }
-    B17001: { topic: income, label: Poverty status, weight: pop, unit: tract }
-    B15003: { topic: education, label: Educational attainment, weight: pop }
-    B14001: { topic: education, label: School enrollment, weight: pop, unit: tract }
-    B23025: { topic: employment, label: Employment status, weight: pop }
-    B08301: { topic: commute, label: Means of transportation to work (by residence), weight: pop }
-    B08303: { topic: commute, label: Travel time to work (by residence), weight: pop }
-    B08601: { topic: commute, label: Means of transportation to work (by workplace), custom: false }
-    B08603: { topic: commute, label: Travel time to work (by workplace), custom: false }
-    C16001: { topic: social, label: Language spoken at home, weight: pop, unit: tract }
-    B18101: { topic: social, label: Disability status, weight: pop, unit: tract }
-    B28002: { topic: social, label: Internet subscriptions, weight: hh }
-    B03002: { topic: population, label: Hispanic or Latino origin by race, weight: pop }
-    B05002: { topic: population, label: Place of birth by nativity, weight: pop, unit: tract }
-    B07003: { topic: population, label: Residence one year ago, weight: pop, unit: tract }
-    B25008: { topic: households, label: Population in occupied housing units, weight: hh }
-    B25004: { topic: housing, label: Vacancy status, weight: hu }
-    B27001: { topic: social, label: Health insurance coverage, weight: pop, unit: tract }
-    B21001: { topic: population, label: Veteran status, weight: pop }
-    B12001: { topic: population, label: Marital status, weight: pop }
-    B25014: { topic: housing, label: Occupants per room (crowding), weight: hh }
-    B19313: { topic: income, label: Aggregate income, weight: pop }
-    B19058: { topic: income, label: Public assistance or SNAP, weight: hh }
-    B08013: { topic: commute, label: Aggregate travel time to work (by residence), weight: pop, unit: tract }
-    C24050: { topic: employment, label: Industry of employed residents, weight: pop, unit: tract }
-
-# Decennial block counts used as allocation weights. A 5-year ACS vintage uses the block group
-# geography of its era: 2020 and later vintages use 2020 blocks, 2019 and earlier use 2010 blocks.
-decennial:
-  2020: { dataset: 2020/dec/pl, pop: P1_001N, hu: H1_001N, hh: H1_002N, tiger_year: 2020 }
-  2010: { dataset: 2010/dec/sf1, pop: P001001, hu: H001001, hh: H003002, tiger_year: 2010 }
-
-crosswalk:
-  era_boundary: 2020           # ACS vintages >= this use the 2020 era, earlier ones the 2010 era
-  whole_unit_share: 0.9999     # a block group at least this inside an area counts as whole
-  equivalent_area_iou: 0.995   # an area whose polygon overlaps one county's this closely (IoU) is that county
-  whole_county_share: 0.995    # a county is whole inside an area above this; an area is a county union above it
-  qa_tolerance: 0.005          # allowed relative gap in the crosswalk QA checks
-  median_tolerance: 0.05       # allowed gap between an interpolated and a published county median
-  median_qa_min_pop: 50000     # ...checked for counties at least this large (brackets are coarse below)
-
-# Medians for WFRC areas cannot be summed or allocated; they are interpolated from bracket counts
-# (rows of the `table` whose label parses to a range, optionally only those containing label_contains).
-medians:
-  - { target: B19013_001, table: B19001 }
-  - { target: B25064_001, table: B25063 }
-  - { target: B25077_001, table: B25075 }
-  - { target: B01002_001, table: B01001 }
-  - { target: B01002_002, table: B01001, label_contains: Male }
-  - { target: B01002_003, table: B01001, label_contains: Female }
+    B17001: { topic: income, label: Poverty status }
+    B15003: { topic: education, label: Educational attainment }
+    B14001: { topic: education, label: School enrollment }
+    B23025: { topic: employment, label: Employment status }
+    B08301: { topic: commute, label: Means of transportation to work (by residence) }
+    B08303: { topic: commute, label: Travel time to work (by residence) }
+    B08601: { topic: commute, label: Means of transportation to work (by workplace) }
+    B08603: { topic: commute, label: Travel time to work (by workplace) }
+    C16001: { topic: social, label: Language spoken at home }
+    B18101: { topic: social, label: Disability status }
+    B28002: { topic: social, label: Internet subscriptions }
+    B03002: { topic: population, label: Hispanic or Latino origin by race }
+    B05002: { topic: population, label: Place of birth by nativity }
+    B07003: { topic: population, label: Residence one year ago }
+    B25008: { topic: households, label: Population in occupied housing units }
+    B25004: { topic: housing, label: Vacancy status }
+    B27001: { topic: social, label: Health insurance coverage }
+    B21001: { topic: population, label: Veteran status }
+    B12001: { topic: population, label: Marital status }
+    B25014: { topic: housing, label: Occupants per room (crowding) }
+    B19313: { topic: income, label: Aggregate income }
+    B19058: { topic: income, label: Public assistance or SNAP }
+    B08013: { topic: commute, label: Aggregate travel time to work (by residence) }
+    C24050: { topic: employment, label: Industry of employed residents }
 
 # Population Estimates Program: annual population for the state, counties and places, from the Census
 # bulk files. The 2010s series is based on the 2010 Census and the 2020s series on the 2020 Census, so
@@ -161,7 +103,7 @@ lodes:
   segment: S000
   job_type: JT00
   latest_only: [tract]       # tracts are published for the latest year only (maps); history stays in raw
-  od_geographies: [aog, mpo, rpo, fws, county, place]
+  od_geographies: [county, place]
   other_id: other-ut         # OD id for a block of this state outside every area of a geography type
   drop_zero: [place, tract]  # these files omit rows of zero jobs (a missing row means zero)
 

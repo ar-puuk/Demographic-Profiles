@@ -5,5 +5,4 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG_FILE = ROOT / "config" / "config.yml"
 RAW = ROOT / "raw"
 DATA = ROOT / "data"
-BOUNDARIES = DATA / "boundaries"
 META = DATA / "meta"

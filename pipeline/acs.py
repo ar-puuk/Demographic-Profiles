@@ -99,9 +99,7 @@ def validate(refresh: bool = False) -> pd.DataFrame:
                     relabeled.setdefault(table, []).append(vintage)
             for code in codes:
                 rows.append({"vintage": vintage, "table": table, "topic": tc["topic"],
-                             "agg": tc.get("agg", "sum"), "weight": tc.get("weight"),
-                             "custom": tc.get("custom", True), "unit": tc.get("unit", "bg"),
-                             "variable": code[:-1],
+                             "agg": tc.get("agg", "sum"), "variable": code[:-1],
                              "label": clean_label(variables[code]["label"]),
                              "concept": variables[code].get("concept", "")})
     if problems:

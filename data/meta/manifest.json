@@ -1,10 +1,6 @@
 {
   "acs": {
     "files": {
-      "commute/block_group": {
-        "bytes": 163332,
-        "rows": 143420
-      },
       "commute/county": {
         "bytes": 125617,
         "rows": 31958
@@ -20,10 +16,6 @@
       "commute/tract": {
         "bytes": 1280567,
         "rows": 690012
-      },
-      "education/block_group": {
-        "bytes": 98258,
-        "rows": 70700
       },
       "education/county": {
         "bytes": 54450,
@@ -41,10 +33,6 @@
         "bytes": 784973,
         "rows": 306660
       },
-      "employment/block_group": {
-        "bytes": 77838,
-        "rows": 183820
-      },
       "employment/county": {
         "bytes": 155184,
         "rows": 39382
@@ -60,10 +48,6 @@
       "employment/tract": {
         "bytes": 1822905,
         "rows": 856744
-      },
-      "households/block_group": {
-        "bytes": 189988,
-        "rows": 76760
       },
       "households/county": {
         "bytes": 59954,
@@ -81,10 +65,6 @@
         "bytes": 891101,
         "rows": 331472
       },
-      "housing/block_group": {
-        "bytes": 448284,
-        "rows": 274720
-      },
       "housing/county": {
         "bytes": 229026,
         "rows": 62060
@@ -100,10 +80,6 @@
       "housing/tract": {
         "bytes": 2747484,
         "rows": 1333400
-      },
-      "income/block_group": {
-        "bytes": 194392,
-        "rows": 163620
       },
       "income/county": {
         "bytes": 147346,
@@ -121,10 +97,6 @@
         "bytes": 2443793,
         "rows": 804948
       },
-      "population/block_group": {
-        "bytes": 720835,
-        "rows": 383800
-      },
       "population/county": {
         "bytes": 321592,
         "rows": 85898
@@ -140,10 +112,6 @@
       "population/tract": {
         "bytes": 5167234,
         "rows": 1847432
-      },
-      "social/block_group": {
-        "bytes": 112222,
-        "rows": 296940
       },
       "social/county": {
         "bytes": 163588,
@@ -469,43 +437,22 @@
       2024
     ]
   },
+  "employment_qa": {
+    "failures": []
+  },
   "lodes": {
     "files": {
-      "od/aog": {
-        "bytes": 4410
-      },
       "od/county": {
         "bytes": 260284
-      },
-      "od/fws": {
-        "bytes": 44178
-      },
-      "od/mpo": {
-        "bytes": 4430
       },
       "od/place": {
         "bytes": 4167351
       },
-      "od/rpo": {
-        "bytes": 6558
-      },
-      "rac/aog": {
-        "bytes": 3726
-      },
       "rac/county": {
         "bytes": 55507
       },
-      "rac/fws": {
-        "bytes": 17603
-      },
-      "rac/mpo": {
-        "bytes": 3713
-      },
       "rac/place": {
         "bytes": 475294
-      },
-      "rac/rpo": {
-        "bytes": 4996
       },
       "rac/state": {
         "bytes": 3804
@@ -513,23 +460,11 @@
       "rac/tract": {
         "bytes": 61628
       },
-      "wac/aog": {
-        "bytes": 3959
-      },
       "wac/county": {
         "bytes": 54897
       },
-      "wac/fws": {
-        "bytes": 17798
-      },
-      "wac/mpo": {
-        "bytes": 3922
-      },
       "wac/place": {
         "bytes": 395735
-      },
-      "wac/rpo": {
-        "bytes": 4940
       },
       "wac/state": {
         "bytes": 3897
@@ -544,15 +479,11 @@
     ]
   },
   "pep": {
-    "areas": 30,
     "county": 435,
     "place": 3805,
     "state": 15
   },
   "qcew": {
-    "areas": {
-      "bytes": 17777
-    },
     "county": {
       "bytes": 145009
     },
@@ -561,38 +492,14 @@
     }
   },
   "web_export": {
-    "aog": {
-      "bytes": 27221
-    },
     "county": {
       "bytes": 277723
-    },
-    "fws": {
-      "bytes": 49044
-    },
-    "mpo": {
-      "bytes": 15646
     },
     "place": {
       "bytes": 439040
     },
-    "rest-aog": {
-      "bytes": 22888
-    },
-    "rest-fws": {
-      "bytes": 23817
-    },
-    "rest-mpo": {
-      "bytes": 15640
-    },
     "rest-place": {
       "bytes": 237969
-    },
-    "rest-rpo": {
-      "bytes": 20486
-    },
-    "rpo": {
-      "bytes": 24214
     },
     "state": {
       "bytes": 1153

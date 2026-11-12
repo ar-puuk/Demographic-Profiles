@@ -2,6 +2,7 @@
 The web app draws the same mark as SVG (src/components/Logo.svelte, public/favicon.svg); keep the geometry in step.
 Run: python scripts/make-logo.py  (needs Pillow)."""
 from pathlib import Path
+
 from PIL import Image, ImageDraw
 
 HEX = [(16, 1), (29, 8.5), (29, 23.5), (16, 31), (3, 23.5), (3, 8.5)]

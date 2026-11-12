@@ -1,33 +1,19 @@
 {
  "benchmarks": [
-  "49",
-  "aog-wfrc",
-  "mpo-wfrc"
+  "49"
  ],
- "custom_since": 2013,
- "custom_types": [
-  "aog",
-  "mpo",
-  "rpo",
-  "fws"
- ],
- "default_type": "aog",
+ "default_type": "state",
  "defaults": {
-  "aog": "aog-wfrc",
   "county": "49035",
-  "mpo": "mpo-wfrc",
   "place": "4967000",
   "state": "49"
  },
- "organization": "WFRC",
+ "organization": "",
  "outside_id": "other-ut",
- "region_labels": {
-  "aog-wfrc": "WFRC region"
- },
  "state": {
   "abbr": "UT",
   "fips": "49",
   "name": "Utah"
  },
- "title": "WFRC Community Profiles"
+ "title": "Utah Community Profiles"
 }

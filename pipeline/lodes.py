@@ -1,8 +1,7 @@
 """LEHD LODES: jobs by workplace (WAC), workers by residence (RAC) and commute flows (OD).
 
 LODES is published at the block, so every number here is a sum of whole blocks (method = aggregated)
-for the state, counties, places, tracts and the WFRC areas; nothing is allocated. Blocks are assigned to
-the WFRC areas by the same crosswalk as the ACS tables (raw/derived/block_area_2020.parquet).
+for the state, counties, places and tracts; nothing is allocated. Blocks are assigned to them by the LODES geography crosswalk.
 Block counts carry noise infusion by the Census Bureau, so small areas are noisy.
 
 Outputs (data):
@@ -101,9 +100,8 @@ def download(src: str, dest: Path, refresh: bool = False) -> Path:
     raise RuntimeError(f"Could not download {src}: {last}")
 
 
-def build_block_geo(con: duckdb.DuckDBPyConnection, xwalk: Path, area_blocks: Path) -> None:
-    """Table block_geo (block, geo_type, geo_id): state, county, place and tract from the LODES crosswalk,
-    plus the WFRC areas from the crosswalk stage."""
+def build_block_geo(con: duckdb.DuckDBPyConnection, xwalk: Path) -> None:
+    """Table block_geo (block, geo_type, geo_id): state, county, place and tract from the LODES crosswalk."""
     con.execute(f"""
         CREATE OR REPLACE TABLE block_geo AS
         WITH x AS (SELECT tabblk2020 AS block, cty, trct, stplc
@@ -113,8 +111,6 @@ def build_block_geo(con: duckdb.DuckDBPyConnection, xwalk: Path, area_blocks: Pa
         UNION ALL SELECT block, 'county', cty FROM x
         UNION ALL SELECT block, 'place', stplc FROM x WHERE stplc <> '9999999'
         UNION ALL SELECT block, 'tract', trct FROM x
-        UNION ALL SELECT block, split_part(geo_id, '-', 1), geo_id
-                  FROM read_parquet('{sql_path(area_blocks)}')
     """)
 
 
@@ -178,9 +174,6 @@ def od_part(con: duckdb.DuckDBPyConnection, year: int, main: Path, aux: Path, ge
 def run(refresh: bool = False) -> None:
     cfg = load_config()
     lc = cfg["lodes"]
-    area_blocks = RAW / "derived" / "block_area_2020.parquet"
-    if not area_blocks.exists():
-        raise SystemExit("Run `profiles crosswalk` first: LODES needs the block to area assignment.")
     years = lc["years"]
     jobs = [url(lc, "xwalk")]
     for y in years:
@@ -193,7 +186,7 @@ def run(refresh: bool = False) -> None:
                 print(f"downloaded {i}/{len(futures)} LODES files", flush=True)
 
     con = connect()
-    build_block_geo(con, url(lc, "xwalk")[1], area_blocks)
+    build_block_geo(con, url(lc, "xwalk")[1])
     drop_zero = lc["drop_zero"]
     for y in years:
         for kind in ("wac", "rac"):

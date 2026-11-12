@@ -29,7 +29,7 @@ def county_fips(state: str, year: int, refresh: bool = False) -> list[str]:
 
 def blocks(state: str, year: int, counties_fips: list[str], refresh: bool = False) -> Path:
     """Path to a GeoParquet of block internal points (block, aland) for the census year, cached in raw.
-    Only the internal point and land area are kept; the crosswalk assigns blocks to areas by that point."""
+    Only the internal point and land area are kept; the export weights each area's flow-map point by them."""
     cache = RAW / "tiger" / f"blocks_{state}_{year}.parquet"
     if not cache.exists() or refresh:
         suffix = str(year)[-2:]
