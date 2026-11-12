@@ -4,7 +4,7 @@ Decided with the maintainer after reviewing layout prototypes (canvas "Community
 
 ## Layout (D)
 
-- **Navbar:** app name, search (find any city, county or planning area), Methods, theme toggle. No link to wfrc.utah.gov.
+- **Navbar:** app name, search (find any city or county), Methods, theme toggle.
 - **Floating icon rail** (rounded, shadowed, over the page like education-explorer) for the tabs: Overview, Population, Housing, Income and education, Jobs and commute, Indicators.
 - **Map workspace** (left, about 390px, balanced: neither a thumbnail nor the whole page): a map of any variable, an optional second variable for a **bivariate map** (3 by 3 palette), a legend, the area pickers (kind, area, compare) and a short key to the method labels. This replaces the list of counties.
 - **Content** (right): an area header with the compare switch and a **period slider with Play**, then the tab's screen.
@@ -13,10 +13,10 @@ Decided with the maintainer after reviewing layout prototypes (canvas "Community
 
 ## Choosing areas
 
-- **The navbar search is the area picker.** The field shows the current area as a chip; opening it shows filter chips (Region, MPO, RPO, Workshop areas, Counties, Cities and towns), type-ahead and a browsable list. Every row has a Compare action.
-- **Compare is any area against any other** (county with county, city with county, planning area with the state). Utah is only the first benchmark offered, not the only one.
-- **What the compare list suggests, in order:** (1) areas of the same kind (counties for a county, cities for a city), (2) the larger areas around it: for a city, its county, the WFRC region or MPO if it lies in one, and Utah; for a county, the WFRC region, MPO and Utah, (3) anything else by search. Salt Lake City against Salt Lake County, Salt Lake City against Utah, Salt Lake County against Utah County and Salt Lake County against Utah are all first-class.
-- Needs a containment lookup in the pipeline: each place and county mapped to its county, WFRC region, MPO and RPO (spatial join in DuckDB, written to `data/meta/`).
+- **The navbar search is the area picker.** The field shows the current area as a chip; opening it shows filter chips (Counties, Cities and towns), type-ahead and a browsable list. Every row has a Compare action.
+- **Compare is any area against any other** (county with county, city with county, city or county with the state). Utah is only the first benchmark offered, not the only one.
+- **What the compare list suggests, in order:** (1) areas of the same kind (counties for a county, cities for a city), (2) the larger areas around it: for a city or county, Utah, (3) anything else by search. Salt Lake City against Salt Lake County, Salt Lake City against Utah, Salt Lake County against Utah County and Salt Lake County against Utah are all first-class.
+- Needs a containment lookup in the pipeline: each place mapped to its county (spatial join in DuckDB, written to `data/meta/`).
 - No separate kind and area selects.
 
 ## The map

@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     # Pinned: this is the version whose spatial extension loads under the Windows Application Control policy
-    # on WFRC machines (1.5.6 and 2.0.0 binaries were blocked on the maintainer's machine). The maintainer may
+    # on some Windows machines (1.5.6 and 2.0.0 binaries were blocked on the maintainer's machine). The maintainer may
     # test 2.0.0; bump deliberately and check that `LOAD spatial` works.
     "duckdb==1.5.4",
     "geopandas",  # only for pygris

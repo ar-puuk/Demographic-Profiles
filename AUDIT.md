@@ -1,5 +1,6 @@
 # Calculation audit, 2026-11-07
 
+> **Historical.** This audit was done on the original WFRC version, which also built planning areas (AOG, MPO, RPO, workshop areas) from block groups. That machinery has been removed from this fork, so findings about areas, the crosswalk and interpolated medians no longer apply; the ACS, LODES, PEP and QCEW findings still do.
 Scope: pipeline (ACS, LODES, PEP, QCEW, aggregation, export), committed `data/`, and the web app's derived numbers.
 Method: four independent read-only reviews (ACS pipeline, LODES/PEP/QCEW, front end, data invariants via DuckDB). Existing tests pass (46 Python, 19 vitest), but none cover the issues below.
 No code or data was changed. Detailed per-agent reports (file:line, queries) are in the session scratchpad.

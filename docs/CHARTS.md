@@ -8,7 +8,7 @@ The plan for what the app shows. Each tab is one screen (about six to eight pane
 - **Derive**: computed from tables we already have (a share, a rate, a sum of categories).
 - **New**: needs a table added to the pipeline (`config/config.yml`) and a re-run.
 
-The geography notes use: **S** state, **C** county, **P** city or town, **T** tract (latest year only), **W** WFRC areas (region, MPO, RPO, workshop areas; from 2013 for ACS).
+The geography notes use: **S** state, **C** county, **P** city or town, **T** tract (latest year only).
 
 ## Tabs
 
@@ -43,7 +43,7 @@ Key figures (tiles, each with its method chip and the compared area's value): po
 
 ## 2. Map
 
-One variable shades the map; an optional second makes it bivariate (3 by 3). Layers: counties, cities and towns, census tracts (latest year), WFRC areas. Extent: Wasatch Front or all of Utah. Legend with markers for the selected and compared areas; hover shows the value; click picks an area, Shift-click compares.
+One variable shades the map; an optional second makes it bivariate (3 by 3). Layers: counties, cities and towns, census tracts (latest year). Extent: all of Utah. Legend with markers for the selected and compared areas; hover shows the value; click picks an area, Shift-click compares.
 
 Mappable variables (a single list in `web/src/lib/indicators.ts`): the 20 indicators now defined, plus the **New** and **Derive** ones below as they land. Rates and shares only, plus counts shown per capita or as density, never raw counts that just track population.
 
@@ -113,7 +113,7 @@ Mappable variables (a single list in `web/src/lib/indicators.ts`): the 20 indica
 |---|---|---|---|
 | Household income | bars by bracket | `B19001` | Ready |
 | Median household income | line, MOE band | `B19013` | Ready |
-| Poverty rate | line and bars | `B17001_002` (WFRC areas are split from tracts: caveat shown) | Ready |
+| Poverty rate | line and bars | `B17001_002` | Ready |
 | Poverty by age and sex | bars: children, working age, 65 plus | `B17001` age rows | Ready |
 | Income to poverty ratio | bars: under 0.5, under 1, under 2 | `C17002` | New |
 | Per capita income | line | `B19301` | New |
@@ -136,7 +136,7 @@ Mappable variables (a single list in `web/src/lib/indicators.ts`): the 20 indica
 
 ## 8. Jobs and economy
 
-Two sources, kept apart and labelled: **LEHD LODES8** counts jobs by workplace and workers by residence; **BLS QCEW** gives employment, establishments and wages (counties, the state and whole-county WFRC areas).
+Two sources, kept apart and labelled: **LEHD LODES8** counts jobs by workplace and workers by residence; **BLS QCEW** gives employment, establishments and wages (counties and the state).
 
 | Panel | Chart | Variables | Status |
 |---|---|---|---|
@@ -190,8 +190,8 @@ The full table grouped by topic: value, margin of error, method, period, and the
 ## Cross-cutting rules
 
 - **Year-aware everywhere**, with the chosen year highlighted on every trend. Population by sex and age follows the year as well.
-- **Series breaks** are shown, not hidden: `B11012` has no data 2015 to 2018; `B25034`, `B25063`, `B25075` and `B16001` change categories in older vintages; `B15003` and `B18101` start 2012, `B23025` 2011, `B28002` 2017, `B08601` and `B08603` 2010; WFRC areas start 2013; tract values are the latest year only; the PEP series steps at 2020 and LODES stops at 2023.
-- **Margins of error** as bands or a ± next to the value; WFRC medians are interpolated and carry none; an area with a very wide margin gets a small-area note.
+- **Series breaks** are shown, not hidden: `B11012` has no data 2015 to 2018; `B25034`, `B25063`, `B25075` and `B16001` change categories in older vintages; `B15003` and `B18101` start 2012, `B23025` 2011, `B28002` 2017, `B08601` and `B08603` 2010; tract values are the latest year only; the PEP series steps at 2020 and LODES stops at 2023.
+- **Margins of error** as bands or a ± next to the value; an area with a very wide margin gets a small-area note.
 - **Method chips** on figures and tiles; bar charts carry them in their table view.
 - **Sources** on every panel, specific to the year shown; no combined footnote.
 - **No ranking or recommendation.** Lists are alphabetical; the map shades by group, it does not number places.
@@ -200,10 +200,10 @@ The full table grouped by topic: value, margin of error, method, period, and the
 
 ## Pipeline additions this plan needs
 
-- ACS tables (all at county, place, tract and block group where published, with the block group allocation for WFRC areas; add `unit: tract` where the Census does not publish them below tract): `B03002`, `B05002`, `B05006`, `B07003`, `B09002`, `B09020`, `B11003`, `B11007`, `B11016`, `B14002`, `B14005`, `B15002`, `B15011`, `B16004`, `B16007`, `B18102` to `B18107`, `B19051`, `B19055`, `B19058`, `B19083`, `B19113`, `B19301`, `B20004`, `B21001`, `B22003`, `B23001`, `B24080`, `B25004`, `B25010`, `B25014`, `B25035`, `B25042`, `B25088`, `B25106`, `B26101`, `B27001`, `B27010`, `B28001`, `B08013`, `B08105A` to `B08105I`, `B08119`, `B08141`, `B08302`, `C17002`, `C24010`, `C24030`.
+- ACS tables (all at county, place and tract where published): `B03002`, `B05002`, `B05006`, `B07003`, `B09002`, `B09020`, `B11003`, `B11007`, `B11016`, `B14002`, `B14005`, `B15002`, `B15011`, `B16004`, `B16007`, `B18102` to `B18107`, `B19051`, `B19055`, `B19058`, `B19083`, `B19113`, `B19301`, `B20004`, `B21001`, `B22003`, `B23001`, `B24080`, `B25004`, `B25010`, `B25014`, `B25035`, `B25042`, `B25088`, `B25106`, `B26101`, `B27001`, `B27010`, `B28001`, `B08013`, `B08105A` to `B08105I`, `B08119`, `B08141`, `B08302`, `C17002`, `C24010`, `C24030`.
 - Decennial 2010 and 2020 (P, H and DHC tables) shown as their own source for those two years.
 - PEP components of change.
-- A containment lookup (place and county to county, WFRC region, MPO, RPO) for the compare suggestions.
+- A containment lookup (place to county) for the compare suggestions.
 - Medians and means that are not additive (`B19301`, `B25010`, `B25035`, `B25088`, `B08013`) use the existing derivation rules or are marked `aggregated` only where exact.
 
 Every table above was checked against the Census Bureau's 2024 ACS 5-year table list and exists (`B08105` only as the lettered race iterations). A few are newer and start later than 2009 (for example `B15011`, `B26101`, `B27010`, `B28001`); the `validate` stage records each table's first vintage in `data/meta/acs-availability.md`, and the app shows the series from there. Anything not in the pipeline yet is fetched from the Census API the same way the current tables are.
