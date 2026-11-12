@@ -24,7 +24,7 @@ test("loads the overview for the default area with no errors", async ({ page }) 
   const errors = watchErrors(page);
   await page.goto("/");
   await ready(page);
-  await expect(page.getByRole("heading", { level: 2 })).toContainText("WFRC region");
+  await expect(page.getByRole("heading", { level: 2 })).toContainText("Utah");
   await expect(page.getByText("Population over time")).toBeVisible();
   expect(errors).toEqual([]);
 });

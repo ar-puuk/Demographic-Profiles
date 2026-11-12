@@ -9,9 +9,6 @@
 
   const SUBS = [{ id: "income", label: "Income" }, { id: "poverty", label: "Poverty and work" }];
   let sub = $state("income");
-  // Poverty is not published below the tract, so a WFRC area is split from tracts and is the more approximate table.
-  const custom = $derived(app.refs.some((r) => ["aog", "mpo", "rpo", "fws"].includes(r.type)));
-  const planning = $derived(custom ? "Planning areas are split from tracts, so this is approximate." : "")
 </script>
 
 <div class="tab">
@@ -31,8 +28,8 @@
     </div>
   {:else}
     <div class="g" style="grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(0,1fr) minmax(0,1fr)">
-      <ShareCard title="Poverty status" spec={SPECS.poverty} note={planning} />
-      <RateCard title="Poverty by age" spec="povertyByAge" note="Share of each age group below the poverty level. {planning}" style="grid-row:1 / span 2" />
+      <ShareCard title="Poverty status" spec={SPECS.poverty} />
+      <RateCard title="Poverty by age" spec="povertyByAge" note="Share of each age group below the poverty level." style="grid-row:1 / span 2" />
       <ShareCard title="Industry of employed residents" spec={SPECS.residentIndustry} sort note="Where residents work, wherever the job is." style="grid-row:1 / span 2" />
       <TrendCard title="People below the poverty level" id="poverty" />
     </div>

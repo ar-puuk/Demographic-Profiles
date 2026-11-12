@@ -8,16 +8,12 @@ export interface Site {
   default_type: string;
   defaults: Record<string, string>;
   benchmarks: string[];
-  region_labels: Record<string, string>;
-  custom_types: string[];
-  custom_since: number;
   outside_id: string;
   state: { abbr: string; fips: string; name: string };
 }
 
 export const site: Site = {
-  title: "Community Profiles", organization: "", default_type: "state", defaults: {}, benchmarks: [], region_labels: {},
-  custom_types: [], custom_since: 0, outside_id: "other", state: { abbr: "", fips: "", name: "" },
+  title: "Community Profiles", organization: "", default_type: "state", defaults: {}, benchmarks: [], outside_id: "other", state: { abbr: "", fips: "", name: "" },
 };
 
 export async function loadSite(): Promise<void> {

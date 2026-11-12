@@ -7,11 +7,11 @@
   import { site } from "../lib/site";
   import Icon from "./Icon.svelte";
 
-  const KIND_LABEL: Record<string, string> = { aog: "Region", mpo: "MPO", rpo: "RPO", fws: "Workshop area", county: "County", place: "City or town", state: "State" };
-  const PLURAL: Record<string, string> = { county: "Counties", place: "Cities/Towns", fws: "Workshop areas", rpo: "RPOs", mpo: "MPOs", aog: "Regions" };
-  const AREA_KINDS = [["all", "All"], ["aog", "Region"], ["mpo", "MPO"], ["rpo", "RPO"], ["fws", "Workshop areas"], ["county", "Counties"], ["place", "Cities/Towns"]] as const;
-  const COMPARE_KINDS = [["suggested", "Suggested"], ["county", "Counties"], ["place", "Cities/Towns"], ["fws", "Workshop areas"], ["rpo", "RPO"], ["mpo", "MPO"], ["aog", "Region"]] as const;
-  const ORDER = ["state", "aog", "mpo", "rpo", "fws", "county", "place"];
+  const KIND_LABEL: Record<string, string> = { county: "County", place: "City or town", state: "State" };
+  const PLURAL: Record<string, string> = { county: "Counties", place: "Cities/Towns" };
+  const AREA_KINDS = [["all", "All"], ["county", "Counties"], ["place", "Cities/Towns"]] as const;
+  const COMPARE_KINDS = [["suggested", "Suggested"], ["county", "Counties"], ["place", "Cities/Towns"]] as const;
+  const ORDER = ["state", "county", "place"];
 
   const mode = $derived(app.picker);
   let query = $state("");
@@ -80,7 +80,7 @@
   }
   $effect(() => { query; kind; active = 0; });
   const kinds = $derived(mode === "compare" ? COMPARE_KINDS : AREA_KINDS);
-  const note = $derived(mode === "compare" ? "Same kind first, then the larger areas around it" : `${app.geos.length} areas: region, MPO, RPO, workshop areas, counties, cities and towns`);
+  const note = $derived(mode === "compare" ? "Same kind first, then the larger areas around it" : `${app.geos.length} areas: the state, counties, cities and towns`);
 </script>
 
 <svelte:window onresize={measure} />
@@ -94,7 +94,7 @@
         <Icon name="search" size={15} />
         <input
           bind:this={input} bind:value={query} {onkeydown} type="search" autocomplete="off"
-          placeholder={mode === "compare" ? `Compare ${app.selected?.label} with…` : "Type a city, county or planning area"}
+          placeholder={mode === "compare" ? `Compare ${app.selected?.label} with…` : "Type a city or county"}
           role="combobox" aria-expanded="true" aria-controls="picker-list" aria-autocomplete="list"
           aria-activedescendant={areaRows[active] ? `opt-${areaRows[active].geo.geo_id}` : undefined}
           aria-label={mode === "compare" ? "Search for an area to compare with" : "Search for an area"}

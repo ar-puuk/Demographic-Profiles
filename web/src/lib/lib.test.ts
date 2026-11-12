@@ -17,7 +17,7 @@ describe("hash state", () => {
   });
   it("ignores junk and omits the default tab", () => {
     expect(parseHash("#v=abc&tab=").v).toBeUndefined();
-    expect(formatHash({ type: "aog", id: "aog-wfrc", tab: "overview" })).toBe("#type=aog&id=aog-wfrc");
+    expect(formatHash({ type: "county", id: "49035", tab: "overview" })).toBe("#type=county&id=49035");
   });
 });
 

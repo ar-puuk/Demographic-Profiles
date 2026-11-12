@@ -18,7 +18,7 @@ export const TABS = [
   { id: "indicators", label: "Indicators", icon: "table" },
 ] as const;
 
-export const displayName = (g: Geography) => (g.geo_type === "state" ? site.state.name : site.region_labels[g.geo_id] ?? g.geo_name);
+export const displayName = (g: Geography) => (g.geo_type === "state" ? site.state.name : g.geo_name);
 
 class App {
   db = $state.raw<Db>();
@@ -43,8 +43,7 @@ class App {
   compare = $derived<AreaRef | undefined>(this.compareGeo && { id: this.compareGeo.geo_id, type: this.compareGeo.geo_type, label: displayName(this.compareGeo) });
   refs = $derived<AreaRef[]>([this.selected, this.compare].filter((r): r is AreaRef => !!r));
   typeInfo = $derived(GEO_TYPES.find((t) => t.id === this.type)!);
-  // Custom areas are built from block groups, which the Census publishes from the 2013 vintage (site.custom_since).
-  years = $derived(this.vintages.filter((v) => !this.refs.some((r) => site.custom_types.includes(r.type)) || v >= site.custom_since));
+  years = $derived(this.vintages);
   latestVintage = $derived(this.vintages.at(-1) ?? 0);
   lodesLatest = $derived(this.lodesYears.at(-1) ?? 0);
   qcewLatest = $derived(this.qcewYears.at(-1) ?? 0);

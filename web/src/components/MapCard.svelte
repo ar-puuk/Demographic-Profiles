@@ -28,8 +28,8 @@
   const indY = $derived(idY ? BY_ID[idY] : null);
   const mapInds = INDICATORS.filter((i) => i.map);
   const mode = $derived(theme.resolved);
-  const PLURAL: Record<string, string> = { county: "counties", place: "cities/towns", fws: "workshop areas", rpo: "RPOs", mpo: "MPOs", aog: "regions", state: "states" };
-  const layerPlural = $derived(PLURAL[["state", "aog", "mpo", "rpo"].includes(app.type) ? "county" : app.type] ?? app.typeInfo.plural);
+  const PLURAL: Record<string, string> = { county: "counties", place: "cities/towns", state: "states" };
+  const layerPlural = $derived(PLURAL[app.type === "state" ? "county" : app.type] ?? app.typeInfo.plural);
 
   const tick = (v: number, f: FormatId, span: number) =>
     f === "money" ? (v >= 10000 ? `$${Math.round(v / 1000)}K` : `$${Math.round(v).toLocaleString("en-US")}`) : f === "pct" ? fmtPct(v, span < 0.1 ? 1 : 0) : f === "int" ? fmtCompact(v) : FORMATS[f](v);
@@ -58,8 +58,8 @@
     const c = controller;
     if (!c || !app.ready || !app.selected) return;
     const x = indX, y = indY, tracts = layer === "tracts", sel = app.selected, cmp = app.compare;
-    // Areas that are one or two polygons (the state, the region, the MPO, the RPOs) are shown against the counties.
-    const type = tracts ? "tract" : ["state", "aog", "mpo", "rpo"].includes(sel.type) ? "county" : sel.type, period = app.v, db = app.db!;
+    // The state is one polygon, so it is shown against the counties.
+    const type = tracts ? "tract" : sel.type === "state" ? "county" : sel.type, period = app.v, db = app.db!;
     const mine = ++token;
     (async () => {
       const [vx, vy, vmx, vmy, shapes, selShapes, cmpShapes] = await Promise.all([

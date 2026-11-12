@@ -2,7 +2,7 @@
 // number is defined once. `num`/`den` are ACS variable codes (summed); a median uses `num` alone.
 //
 //   type  count  one variable, a count
-//         median one variable, a median (WFRC areas interpolate it from brackets; its margin of error is built from the bracket margins)
+//         median one variable, a median
 //         share  sum(num) / sum(den)
 // `map: true` marks indicators that can colour the map (one topic, available for tracts).
 import type { FormatId } from "./format";
@@ -92,16 +92,12 @@ export const BY_ID: Record<string, Indicator> = Object.fromEntries(INDICATORS.ma
 // Every ACS variable an indicator reads, as a flat list.
 export const variablesOf = (ind: Indicator): string[] => [...ind.num, ...(ind.den ?? []), ...(ind.minus ?? [])];
 
-export type GeoType = "aog" | "mpo" | "rpo" | "fws" | "county" | "place" | "state";
+export type GeoType = "county" | "place" | "state";
 
 // The geography types a reader can pick, in menu order.
-export const GEO_TYPES: { id: GeoType; label: string; plural: string; custom: boolean }[] = [
-  { id: "aog", label: "WFRC region (Association of Governments)", plural: "regions", custom: true },
-  { id: "mpo", label: "Metropolitan Planning Organization", plural: "MPOs", custom: true },
-  { id: "rpo", label: "Rural Planning Organization", plural: "RPOs", custom: true },
-  { id: "fws", label: "Workshop area", plural: "workshop areas", custom: true },
-  { id: "county", label: "County", plural: "counties", custom: false },
-  { id: "place", label: "City or town", plural: "places", custom: false },
-  { id: "state", label: "State", plural: "states", custom: false },
+export const GEO_TYPES: { id: GeoType; label: string; plural: string }[] = [
+  { id: "county", label: "County", plural: "counties" },
+  { id: "place", label: "City or town", plural: "places" },
+  { id: "state", label: "State", plural: "states" },
 ];
 export const TYPE_LABEL: Record<string, string> = Object.fromEntries(GEO_TYPES.map((t) => [t.id, t.label]));

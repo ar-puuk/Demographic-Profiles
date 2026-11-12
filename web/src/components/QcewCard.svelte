@@ -1,6 +1,6 @@
 <script lang="ts">
   // Private-sector employment or average annual pay by industry sector (BLS QCEW), for the chosen year, or the eight largest
-  // sectors over the years. BLS publishes it only for counties, the state and a few planning areas.
+  // sectors over the years. BLS publishes it only for counties and the state.
   import { app } from "../lib/app.svelte";
   import { CATEGORY_COLORS, bars, lines, type BarRow, type LineSeries } from "../lib/charts";
   import { qcewCodes, qcewIndustries, qcewSeries } from "../lib/data";
@@ -13,7 +13,7 @@
   let { variable, style = "" }: { variable: "employment" | "avg_annual_pay"; style?: string } = $props();
   let when = $state<"snapshot" | "trend">("snapshot");
   const year = $derived(Math.min(app.v, app.qcewLatest));
-  const NO_QCEW = "BLS publishes this only for counties, the state, the WFRC region and Morgan RPO, and from 2014.";
+  const NO_QCEW = "BLS publishes this only for counties and the state, and from 2014.";
   const fmt = $derived(variable === "employment" ? fmtInt : fmtMoney);
   const tick = (x: number | null | undefined) => (variable === "employment" ? fmtCompact(x) : `$${fmtCompact(x)}`);
   const what = $derived(variable === "employment" ? "Employment" : "Average annual pay");

@@ -10,7 +10,7 @@ const KEY = "utah-profiles-tour-off";
 type Step = { tab: "overview" | "people"; target: string; title: string; text: string; side?: "top" | "bottom" | "left" | "right" };
 
 const STEPS: Step[] = [
-  { tab: "overview", target: '[data-tour="search"]', title: "Pick an area", text: "Search or browse counties, cities, regions and more. Everything on the page follows the area you choose.", side: "bottom" },
+  { tab: "overview", target: '[data-tour="search"]', title: "Pick an area", text: "Search or browse counties and cities. Everything on the page follows the area you choose.", side: "bottom" },
   { tab: "overview", target: '[data-tour="map"]', title: "The overview map", text: "Every area of the same kind, shaded by one variable. Hover for the value and its trend, click to select, hold Shift and click to compare.", side: "right" },
   { tab: "overview", target: '[data-tour="map-layer"]', title: "Census tracts", text: "This is not a geography filter. Turn it on to draw the same variable for the small census tracts instead of whole counties or cities, for a finer look.", side: "bottom" },
   { tab: "overview", target: '[data-tour="map-vars"]', title: "Change what it shows", text: "Choose the variable that colours the map. Add a second one to see where two things overlap.", side: "top" },

@@ -1,7 +1,7 @@
 // Everything the report shows, loaded once from the same queries the dashboard uses and held as plain data. Nothing here reads
 // the app's live state: the caller freezes it in a `Ctx` first, so changing the area or year while a report builds cannot mix two
 // views in one document.
-import { areaCounties, centroids, geojson, hasPep, indicatorSeries, indicatorValues, lodesSeries, lodesValues, odCountyFlows, odFlowsBy, pepSeries, qcewCodes, qcewIndustries } from "../lib/data";
+import { centroids, geojson, hasPep, indicatorSeries, indicatorValues, lodesSeries, lodesValues, odFlowsBy, pepSeries, qcewCodes, qcewIndustries } from "../lib/data";
 import type { Db } from "../lib/db";
 import { quantileBreaks } from "../lib/classes";
 import { COMMUTE_MIX, buildFlows, commuteSides, summarizeFlows, type OdRow, type Unmapped } from "../lib/flows";
@@ -194,7 +194,7 @@ export function qcew(variable: "employment" | "avg_annual_pay"): Loader {
     const name = (code: string) => SECTOR_BY_NAICS[code] ?? label.get(code) ?? code;
     const per = await Promise.all(ctx.refs.map(async (r) => ({ r, rows: await qcewIndustries(ctx.db, r, ctx.qcew) })));
     const first = per[0].rows.filter((x) => x.industry !== "10" && x.industry !== "99" && typeof x[variable] === "number");
-    if (!first.length) return empty("BLS publishes this only for counties, the state and a few planning areas.");
+    if (!first.length) return empty("BLS publishes this only for counties and the state.");
     const order = first.sort((a, b) => (b[variable] as number) - (a[variable] as number)).slice(0, 8).map((x) => x.industry);
     const rows: Row[] = per.flatMap(({ r, rows }) => order.flatMap((code) => {
       const v = rows.find((x) => x.industry === code)?.[variable];
@@ -288,7 +288,7 @@ export async function loadMap(ctx: Ctx, bases: MapBase[], def: MapDef): Promise<
 
 // ---- commute flows ------------------------------------------------------------------------------------------------
 
-export const OD_TYPES = ["aog", "mpo", "rpo", "fws", "county", "place"];
+export const OD_TYPES = ["county", "place"];
 
 export interface FlowPage { tiles: Tile[]; map: PanelData; byArea: PanelData; mix: PanelData }
 
@@ -311,33 +311,10 @@ export async function loadFlows(ctx: Ctx): Promise<FlowPage | null> {
     tile("Commute out", pct(s.outShare), `${fmtInt(s.outflow)} of ${fmtInt(s.workers)} resident workers`),
     tile("Jobs located here", fmtInt(s.jobs), `LODES8 ${lodes}`),
   ];
-  let { flows, unmapped } = buildFlows(rows, sel.id, "both", 0, new Set(places.keys()));
-  let mapPlaces = places;
+  const { flows, unmapped } = buildFlows(rows, sel.id, "both", 0, new Set(places.keys()));
+  const mapPlaces = places;
   const feats: Feature[] = shapes.features;
   const area = feats.find((f) => f.properties.id === sel.id) ?? null;
-  // An area made of whole counties (the region) has no neighbours of its own kind to draw lines to, so its flows are drawn between the
-  // area and the counties around it, summed from the county flow file.
-  if (places.size < 4 && ["aog", "mpo", "rpo", "fws"].includes(sel.type)) {
-    const members = new Set(await areaCounties(db, sel.id).catch(() => [] as string[]));
-    const here = places.get(sel.id);
-    if (members.size && here) {
-      const [crows, cplaces] = await Promise.all([odCountyFlows(db, [...members], lodes), centroids(db, "county")]);
-      const outAgg = new Map<string, number>(), inAgg = new Map<string, number>();
-      for (const r of crows) {
-        const o = members.has(r.origin_id), d = members.has(r.dest_id);
-        if (o && !d) outAgg.set(r.dest_id, (outAgg.get(r.dest_id) ?? 0) + r.jobs);
-        else if (!o && d) inAgg.set(r.origin_id, (inAgg.get(r.origin_id) ?? 0) + r.jobs);
-      }
-      mapPlaces = new Map([...cplaces].filter(([id]) => !members.has(id)));
-      mapPlaces.set(sel.id, here);
-      const known = new Set(mapPlaces.keys());
-      flows = [...[...outAgg].filter(([id]) => known.has(id)).map(([dest, count]) => ({ origin: sel.id, dest, count })), ...[...inAgg].filter(([id]) => known.has(id)).map(([origin, count]) => ({ origin, dest: sel.id, count }))];
-      const hidden = new Map<string, Unmapped>();
-      for (const [id, n] of outAgg) if (!known.has(id)) hidden.set(id, { id, work: n, live: hidden.get(id)?.live ?? 0 });
-      for (const [id, n] of inAgg) if (!known.has(id)) hidden.set(id, { id, work: hidden.get(id)?.work ?? 0, live: n });
-      unmapped = [...hidden.values()].sort((a, b) => b.work + b.live - (a.work + a.live));
-    }
-  }
   const frame = flowFrame(flows, mapPlaces, sel.id, area);
   const outside = unmapped.slice(0, 3).map((u) => `${name(u.id)} ${fmtCompact(u.work + u.live)}`).join(" · ");
 

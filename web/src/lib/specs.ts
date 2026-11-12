@@ -165,7 +165,7 @@ export const SPECS: Record<string, Spec> = {
 };
 
 // The Census also publishes means of transportation (B08601) and travel time (B08603) by where people work, with the
-// same rows as the by-residence tables. They exist for the state, counties, cities and tracts, not for the planning areas built from tracts.
+// same rows as the by-residence tables. They exist for the state, counties, cities and tracts, not for tracts.
 const swapTable = (spec: Spec, from: string, to: string): Spec => JSON.parse(JSON.stringify(spec).split(from).join(to));
 SPECS.commuteModeWork = swapTable(SPECS.commuteMode, "B08301", "B08601");
 SPECS.travelTimeWork = swapTable(SPECS.travelTime, "B08303", "B08603");

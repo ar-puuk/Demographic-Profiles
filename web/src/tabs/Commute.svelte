@@ -17,14 +17,14 @@
   const SUBS = [{ id: "travel", label: "How people travel" }, { id: "flows", label: "Where they go" }];
   let sub = $state("travel");
 
-  const OD_TYPES = ["aog", "mpo", "rpo", "fws", "county", "place"];
+  const OD_TYPES = ["county", "place"];
   const lodes = $derived(Math.min(app.v, app.lodesLatest));
-  const NO_OD = "Commute flows are published for the region, MPO, RPO, workshop areas, counties and cities.";
+  const NO_OD = "Commute flows are published for counties and cities.";
 
   // The same chart by where workers live (the usual ACS tables) and by where they work (the workplace tables, published for the state, counties and cities).
   const MODE = [{ id: "home", label: "Where they live", spec: SPECS.commuteMode }, { id: "work", label: "Where they work", spec: SPECS.commuteModeWork }];
   const TIME = [{ id: "home", label: "Where they live", spec: SPECS.travelTime }, { id: "work", label: "Where they work", spec: SPECS.travelTimeWork }];
-  const BASIS_NOTE = "Where they work is published for the state, counties and cities, not for planning areas.";
+  const BASIS_NOTE = "Where they work is published for the state, counties and cities, not for tracts.";
 
   const label = (id: string, sel: string) => (id === sel ? "Same area" : id === site.outside_id ? `Elsewhere in ${site.state.name}` : id === "out-of-state" ? `Outside ${site.state.name}` : app.names.get(id) ?? id);
 

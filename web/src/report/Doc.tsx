@@ -199,8 +199,7 @@ function CoverAbout({ m, w }: { m: ReportModel; w: number }): ReactElement {
         <Text style={body(7, { color: C.sel, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" })}>How to read this report</Text>
         {h("How each number was made")}
         {way("direct", "Published", "The Census Bureau publishes this value for exactly this area.")}
-        {way("aggregated", "Aggregate", "An exact sum of whole Census blocks or block groups inside the area.")}
-        {way("allocated", "Estimate", "A WFRC estimate, split from block groups only partly inside the area. A median is interpolated from allocated brackets.")}
+        {way("aggregated", "Aggregate", "An exact sum of whole Census blocks inside the area.")}
         {h("Margins of error")}
         {t("Every American Community Survey figure has a 90 percent margin of error. It is marked use with caution when the margin is over 30 percent of the estimate.")}
         {h("Maps")}
@@ -300,7 +299,7 @@ function TableView({ p, m }: { p: TablePage; m: ReportModel }): ReactElement {
             </View>
           ),
         )}
-        <Text style={body(6, { color: C.muted, marginTop: 6 })}>P published by the Census Bureau for this area · A exact aggregate of whole blocks or block groups · E WFRC estimate. Margins of error are 90%.</Text>
+        <Text style={body(6, { color: C.muted, marginTop: 6 })}>P published by the Census Bureau for this area · A exact aggregate of whole blocks. Margins of error are 90%.</Text>
       </View>
     </Page>
   );

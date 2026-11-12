@@ -18,8 +18,8 @@
 
   let { style = "" }: { style?: string } = $props();
 
-  const OD_TYPES = ["aog", "mpo", "rpo", "fws", "county", "place"];
-  const NO_OD = "Commute flows are published for the region, MPO, RPO, workshop areas, counties and cities.";
+  const OD_TYPES = ["county", "place"];
+  const NO_OD = "Commute flows are published for counties and cities.";
   const DIRECTIONS: { id: Direction; label: string; note: string }[] = [
     { id: "both", label: "Both", note: "Where residents work and where workers live" },
     { id: "work", label: "Where residents work", note: "Lines to the areas where the selected area's residents work" },
@@ -202,7 +202,7 @@
       <div class="fm-mapwrap" hidden={view === "table"}>
         <div class="fm-canvas" bind:this={el} role="application" aria-label={summaryLabel}></div>
         {#if alone}
-          <div class="fm-alone">This area is one region, so there are no other areas of its kind to draw lines to. Choose a county or city to see its routes.</div>
+          <div class="fm-alone">This area has no other areas of its kind to draw lines to. Choose a county or city to see its routes.</div>
         {/if}
         {#if lines && !alone}
           <div class="fm-legend" aria-label="How to read the lines">

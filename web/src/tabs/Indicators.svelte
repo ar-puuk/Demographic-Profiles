@@ -67,5 +67,5 @@
       <p class="error" role="alert">Could not load the indicators: {e instanceof Error ? e.message : e}</p>
     {/await}
   </div>
-  <p class="src">Each value is followed by its margin of error at the 90 percent confidence level, where one is published. WFRC medians are interpolated and have none. Source: {app.acs}; jobs from LEHD LODES8.</p>
+  <p class="src">Each value is followed by its margin of error at the 90 percent confidence level, where one is published. Source: {app.acs}; jobs from LEHD LODES8.</p>
 </section>

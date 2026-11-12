@@ -46,9 +46,9 @@ export type Method = "direct" | "aggregated" | "allocated" | "derived";
 // several rows are combined: a published value beats an aggregate, an aggregate beats an estimate.
 export const METHODS: Record<Method, { label: string; short: string; letter: string; rank: number; note: string }> = {
   direct: { label: "Census published", short: "Published", letter: "P", rank: 0, note: "Published by the Census Bureau for exactly this area." },
-  aggregated: { label: "WFRC aggregate", short: "Aggregate", letter: "A", rank: 1, note: "An exact sum of whole Census blocks or block groups inside this area." },
-  allocated: { label: "WFRC estimate", short: "Estimate", letter: "E", rank: 2, note: "A WFRC estimate: split from block groups that are only partly inside this area, using Census block counts." },
-  derived: { label: "WFRC estimate", short: "Estimate", letter: "E", rank: 2, note: "Median interpolated from allocated bracket counts; its margin of error is built from the bracket margins." },
+  aggregated: { label: "Census aggregate", short: "Aggregate", letter: "A", rank: 1, note: "An exact sum of whole Census blocks inside this area." },
+  allocated: { label: "Estimate", short: "Estimate", letter: "E", rank: 2, note: "An estimate, less certain than a published value." },
+  derived: { label: "Estimate", short: "Estimate", letter: "E", rank: 2, note: "A value derived from other published values; its margin of error is built from theirs." },
 };
 export const methodOf = (rank: number): Method => (["direct", "aggregated", "allocated"] as const)[Math.min(rank, 2)];
 
