@@ -7,10 +7,10 @@
   import { site } from "../lib/site";
   import Icon from "./Icon.svelte";
 
-  const KIND_LABEL: Record<string, string> = { county: "County", place: "City or town", state: "State" };
-  const PLURAL: Record<string, string> = { county: "Counties", place: "Cities/Towns" };
-  const AREA_KINDS = [["all", "All"], ["county", "Counties"], ["place", "Cities/Towns"]] as const;
-  const COMPARE_KINDS = [["suggested", "Suggested"], ["county", "Counties"], ["place", "Cities/Towns"]] as const;
+  const KIND_LABEL: Record<string, string> = { county: "County", place: "Place", state: "State" };
+  const PLURAL: Record<string, string> = { county: "Counties", place: "Cities and towns" };
+  const AREA_KINDS = [["all", "All"], ["county", "Counties"], ["city", "Cities"], ["town", "Towns"], ["other", "Places"]] as const;
+  const COMPARE_KINDS = [["suggested", "Suggested"], ["county", "Counties"], ["city", "Cities"], ["town", "Towns"], ["other", "Places"]] as const;
   const ORDER = ["state", "county", "place"];
 
   const mode = $derived(app.picker);
@@ -28,7 +28,15 @@
   }
 
   type Row = { kind: "group"; label: string } | { kind: "area"; geo: Geography };
-  const label = (g: Geography) => displayName(g) + (g.kind && g.kind !== "city" && g.geo_type === "place" ? ` (${g.kind})` : "");
+  // A filter button is a geography type (county) or, for places, the Census kind: cities, towns, and everything else (CDPs and places with no kind).
+  const PLACE_FILTER: Record<string, (g: Geography) => boolean> = {
+    city: (g) => g.geo_type === "place" && g.kind === "city",
+    town: (g) => g.geo_type === "place" && g.kind === "town",
+    other: (g) => g.geo_type === "place" && g.kind !== "city" && g.kind !== "town",
+  };
+  const matches = (g: Geography, k: string) => (PLACE_FILTER[k] ? PLACE_FILTER[k](g) : g.geo_type === k);
+  const kindLabel = (g: Geography) => (g.geo_type === "place" ? (g.kind === "CDP" ? "Census-designated place" : g.kind ? g.kind[0].toUpperCase() + g.kind.slice(1) : "Place") : KIND_LABEL[g.geo_type]);
+  const label = (g: Geography) => displayName(g);
   const byName = (a: Geography, b: Geography) => ORDER.indexOf(a.geo_type) - ORDER.indexOf(b.geo_type) || a.geo_name.localeCompare(b.geo_name);
 
   $effect(() => {
@@ -46,7 +54,7 @@
     if (q) {
       const starts: Geography[] = [], inside: Geography[] = [];
       for (const g of everything) {
-        if (kind !== "all" && kind !== "suggested" && g.geo_type !== kind) continue;
+        if (kind !== "all" && kind !== "suggested" && !matches(g, kind)) continue;
         const n = label(g).toLowerCase();
         if (n.startsWith(q)) starts.push(g); else if (n.includes(q)) inside.push(g);
       }
@@ -61,7 +69,7 @@
       if (larger.length) out.push({ kind: "group", label: "Larger areas" }, ...larger.map((geo) => ({ kind: "area" as const, geo })));
       return out;
     }
-    const pool = kind === "all" || kind === "suggested" ? everything : everything.filter((g) => g.geo_type === kind);
+    const pool = kind === "all" || kind === "suggested" ? everything : everything.filter((g) => matches(g, kind));
     return pool.sort(byName).map((geo) => ({ kind: "area", geo }));
   });
   const areaRows = $derived(rows.filter((r): r is Extract<Row, { kind: "area" }> => r.kind === "area"));
@@ -114,7 +122,7 @@
           <!-- svelte-ignore a11y_click_events_have_key_events -->
           <li id="opt-{r.geo.geo_id}" role="option" aria-selected={i === active} onclick={() => choose(r.geo)} onmousemove={() => (active = i)}>
             <span class="name">{label(r.geo)}{#if r.geo.geo_id === app.id} <span class="kind">(open)</span>{/if}</span>
-            <span class="kind">{KIND_LABEL[r.geo.geo_type]}</span>
+            <span class="kind">{kindLabel(r.geo)}</span>
             {#if mode === "area"}<button class="act" onclick={(e) => { e.stopPropagation(); choose(r.geo, true); }} aria-label="Compare with {label(r.geo)}">Compare</button>{/if}
           </li>
         {/if}
